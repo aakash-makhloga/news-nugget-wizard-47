@@ -1,48 +1,95 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, ChevronRight, ArrowRight, TrendingUp, Newspaper, BarChart2 } from 'lucide-react';
+import { Loader2, ChevronRight, ArrowRight, TrendingUp, Newspaper, BarChart2, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 import Header from '@/components/Header';
 import StockTicker from '@/components/StockTicker';
 import NewsGrid from '@/components/NewsGrid';
 import AIAnalysis from '@/components/AIAnalysis';
 import Footer from '@/components/Footer';
-import { fetchLatestNews } from '@/utils/newsService';
+import { fetchLatestNews, fetchNewsByCountry } from '@/utils/newsService';
 import { NewsItem } from '@/components/NewsCard';
 import { fetchPopularStocks } from '@/utils/stocksService';
 import { generateNewsAnalysis } from '@/utils/aiService';
+import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
   const [featuredAnalysis, setFeaturedAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('all');
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const news = await fetchLatestNews();
-        setLatestNews(news);
-        
-        // Generate featured analysis for the first news item
-        if (news.length > 0) {
-          const analysis = await generateNewsAnalysis(news[0].id);
-          setFeaturedAnalysis({
-            news: news[0],
-            analysis
-          });
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      let news;
+      if (selectedCountry) {
+        news = await fetchNewsByCountry(selectedCountry);
+      } else {
+        news = await fetchLatestNews();
       }
-    };
-    
+      
+      setLatestNews(news);
+      
+      // Generate featured analysis for the first news item
+      if (news.length > 0) {
+        const analysis = await generateNewsAnalysis(news[0].id);
+        setFeaturedAnalysis({
+          news: news[0],
+          analysis
+        });
+      }
+      
+      toast({
+        title: "Latest news loaded",
+        description: "The news feed has been updated with the latest stories.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast({
+        title: "Error loading news",
+        description: "There was a problem fetching the latest news. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCountry]);
+  
+  useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
+
+  const handleCountryFilter = (country: string) => {
+    setSelectedCountry(country);
+  };
+
+  const handleRefresh = () => {
+    loadData();
+  };
+
+  const countries = [
+    { id: 'global', name: 'Global News' },
+    { id: 'USA', name: 'United States' },
+    { id: 'China', name: 'China' },
+    { id: 'Japan', name: 'Japan' },
+    { id: 'India', name: 'India' },
+    { id: 'United Kingdom', name: 'United Kingdom' },
+    { id: 'European Union', name: 'European Union' },
+    { id: 'Brazil', name: 'Brazil' },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -69,9 +116,24 @@ const Index = () => {
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <Button size="lg" variant="outline" className="font-medium px-8">
-                    Browse Topics
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="lg" variant="outline" className="font-medium px-8">
+                        <Globe className="mr-2 h-4 w-4" />
+                        Browse by Country
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      {countries.map((country) => (
+                        <DropdownMenuItem 
+                          key={country.id} 
+                          onClick={() => handleCountryFilter(country.id === 'global' ? '' : country.id)}
+                        >
+                          {country.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </motion.div>
             </div>
@@ -100,7 +162,7 @@ const Index = () => {
                 <div className="space-y-6">
                   <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800">
                     <TrendingUp className="h-4 w-4 mr-2" />
-                    Featured Story
+                    Featured Story {featuredAnalysis.news.country && `from ${featuredAnalysis.news.country}`}
                   </div>
                   <h2 className="text-3xl md:text-4xl font-display font-medium leading-tight">
                     {featuredAnalysis.news.title}
@@ -112,6 +174,12 @@ const Index = () => {
                     <span>{featuredAnalysis.news.source}</span>
                     <span>•</span>
                     <span>{new Date(featuredAnalysis.news.publishedAt).toLocaleDateString()}</span>
+                    {featuredAnalysis.news.country && (
+                      <>
+                        <span>•</span>
+                        <span>{featuredAnalysis.news.country}</span>
+                      </>
+                    )}
                   </div>
                   <Button className="font-medium" asChild>
                     <a href={`/news/${featuredAnalysis.news.id}`}>
@@ -142,7 +210,9 @@ const Index = () => {
                   <Newspaper className="h-4 w-4 mr-2" />
                   Latest Updates
                 </div>
-                <h2 className="text-3xl font-display font-medium">Today's Top Stories</h2>
+                <h2 className="text-3xl font-display font-medium">
+                  {selectedCountry ? `Top Stories from ${selectedCountry}` : "Today's Top Stories"}
+                </h2>
               </div>
               <Button variant="link" className="font-medium mt-4 md:mt-0">
                 View All News
@@ -150,7 +220,7 @@ const Index = () => {
               </Button>
             </div>
             
-            <Tabs defaultValue="all" className="w-full">
+            <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-8">
                 <TabsTrigger value="all" className="text-sm">All</TabsTrigger>
                 <TabsTrigger value="business" className="text-sm">Business</TabsTrigger>
@@ -160,23 +230,48 @@ const Index = () => {
               </TabsList>
               
               <TabsContent value="all">
-                <NewsGrid news={latestNews} loading={loading} />
+                <NewsGrid 
+                  news={latestNews} 
+                  loading={loading} 
+                  onRefresh={handleRefresh}
+                  onFilterByCountry={handleCountryFilter}
+                />
               </TabsContent>
               
               <TabsContent value="business">
-                <NewsGrid news={latestNews.filter(n => n.category === 'Business')} loading={loading} />
+                <NewsGrid 
+                  news={latestNews.filter(n => n.category === 'Business')} 
+                  loading={loading} 
+                  onRefresh={handleRefresh}
+                  onFilterByCountry={handleCountryFilter}
+                />
               </TabsContent>
               
               <TabsContent value="markets">
-                <NewsGrid news={latestNews.filter(n => n.category === 'Economy' || n.category === 'Commodities')} loading={loading} />
+                <NewsGrid 
+                  news={latestNews.filter(n => n.category === 'Economy' || n.category === 'Commodities')} 
+                  loading={loading}
+                  onRefresh={handleRefresh}
+                  onFilterByCountry={handleCountryFilter}
+                />
               </TabsContent>
               
               <TabsContent value="technology">
-                <NewsGrid news={latestNews.filter(n => n.category === 'Technology')} loading={loading} />
+                <NewsGrid 
+                  news={latestNews.filter(n => n.category === 'Technology')} 
+                  loading={loading}
+                  onRefresh={handleRefresh}
+                  onFilterByCountry={handleCountryFilter}
+                />
               </TabsContent>
               
               <TabsContent value="crypto">
-                <NewsGrid news={latestNews.filter(n => n.category === 'Cryptocurrency')} loading={loading} />
+                <NewsGrid 
+                  news={latestNews.filter(n => n.category === 'Cryptocurrency')} 
+                  loading={loading}
+                  onRefresh={handleRefresh}
+                  onFilterByCountry={handleCountryFilter}
+                />
               </TabsContent>
             </Tabs>
           </div>

@@ -11,6 +11,7 @@ export interface StockData {
   peRatio: number;
   dividend: number;
   sector: string;
+  country?: string;
   history: {
     date: string;
     price: number;
@@ -33,6 +34,7 @@ export const fetchStockData = async (symbol: string): Promise<StockData | null> 
       peRatio: 28.5,
       dividend: 0.92,
       sector: 'Technology',
+      country: 'USA',
       history: generateMockHistory(173.75)
     },
     'MSFT': {
@@ -46,6 +48,7 @@ export const fetchStockData = async (symbol: string): Promise<StockData | null> 
       peRatio: 35.8,
       dividend: 0.68,
       sector: 'Technology',
+      country: 'USA',
       history: generateMockHistory(415.50)
     },
     'GOOGL': {
@@ -59,6 +62,7 @@ export const fetchStockData = async (symbol: string): Promise<StockData | null> 
       peRatio: 24.7,
       dividend: 0,
       sector: 'Technology',
+      country: 'USA',
       history: generateMockHistory(152.33)
     },
     'AMZN': {
@@ -72,6 +76,7 @@ export const fetchStockData = async (symbol: string): Promise<StockData | null> 
       peRatio: 55.2,
       dividend: 0,
       sector: 'Consumer Cyclical',
+      country: 'USA',
       history: generateMockHistory(178.75)
     },
     'TSLA': {
@@ -85,7 +90,78 @@ export const fetchStockData = async (symbol: string): Promise<StockData | null> 
       peRatio: 68.4,
       dividend: 0,
       sector: 'Automotive',
+      country: 'USA',
       history: generateMockHistory(246.30)
+    },
+    'TCEHY': {
+      symbol: 'TCEHY',
+      name: 'Tencent Holdings Ltd.',
+      price: 43.15,
+      change: 0.67,
+      changePercent: 1.58,
+      volume: 3485632,
+      marketCap: 412850000000,
+      peRatio: 22.1,
+      dividend: 0.25,
+      sector: 'Technology',
+      country: 'China',
+      history: generateMockHistory(43.15)
+    },
+    'BABA': {
+      symbol: 'BABA',
+      name: 'Alibaba Group Holding Ltd.',
+      price: 84.20,
+      change: -1.35,
+      changePercent: -1.58,
+      volume: 12564738,
+      marketCap: 213450000000,
+      peRatio: 18.7,
+      dividend: 0,
+      sector: 'Consumer Cyclical',
+      country: 'China',
+      history: generateMockHistory(84.20)
+    },
+    '9984': {
+      symbol: '9984',
+      name: 'SoftBank Group Corp.',
+      price: 6985.00,
+      change: 125.00,
+      changePercent: 1.82,
+      volume: 8573921,
+      marketCap: 10829500000000, // in JPY
+      peRatio: 9.3,
+      dividend: 44.00,
+      sector: 'Technology',
+      country: 'Japan',
+      history: generateMockHistory(6985.00)
+    },
+    'SAP': {
+      symbol: 'SAP',
+      name: 'SAP SE',
+      price: 178.84,
+      change: 2.36,
+      changePercent: 1.34,
+      volume: 1254863,
+      marketCap: 219650000000, // in EUR
+      peRatio: 31.2,
+      dividend: 2.05,
+      sector: 'Technology',
+      country: 'Germany',
+      history: generateMockHistory(178.84)
+    },
+    'RIL': {
+      symbol: 'RIL',
+      name: 'Reliance Industries Ltd.',
+      price: 2875.45,
+      change: 35.60,
+      changePercent: 1.25,
+      volume: 5824637,
+      marketCap: 19452000000000, // in INR
+      peRatio: 17.8,
+      dividend: 9.00,
+      sector: 'Energy',
+      country: 'India',
+      history: generateMockHistory(2875.45)
     }
   };
   
@@ -96,7 +172,7 @@ export const fetchPopularStocks = async (): Promise<StockData[]> => {
   // Simulating API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
+  const symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'TCEHY', 'BABA', '9984', 'SAP', 'RIL'];
   const stocks = await Promise.all(
     symbols.map(async (symbol) => {
       const stock = await fetchStockData(symbol);
