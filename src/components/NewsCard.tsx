@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -16,6 +15,7 @@ export interface NewsItem {
   category: string;
   sentiment: 'positive' | 'negative' | 'neutral';
   url: string;
+  country?: string; // Added country as an optional property
 }
 
 interface NewsCardProps {
