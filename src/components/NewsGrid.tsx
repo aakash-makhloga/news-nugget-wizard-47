@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import NewsCard, { NewsItem } from './NewsCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
-import { Filter, RefreshCw, Search, X } from 'lucide-react';
+import { Filter, RefreshCw, Search, X, Globe, Flag } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Input } from './ui/input';
@@ -63,6 +63,14 @@ const NewsGrid = ({
     };
   }, []);
 
+  // Function to render country flag icon
+  const renderCountryFlag = (country: string) => {
+    if (country === 'All' || country === 'Global') {
+      return <Globe className="h-4 w-4 mr-2 text-blue-500" />;
+    }
+    return <Flag className="h-4 w-4 mr-2 text-blue-500" />;
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -120,7 +128,8 @@ const NewsGrid = ({
         
         <div className="flex items-center gap-3">
           {selectedCountry && (
-            <Badge variant="outline" className="animate-fadeIn">
+            <Badge variant="outline" className="animate-fadeIn flex items-center">
+              {renderCountryFlag(selectedCountry)}
               {selectedCountry}
               <button 
                 className="ml-1 text-gray-500 hover:text-gray-700"
@@ -135,7 +144,7 @@ const NewsGrid = ({
             <Button 
               variant="outline" 
               size="sm" 
-              className="country-filter-btn"
+              className="country-filter-btn flex items-center"
               onClick={() => setShowSearch(!showSearch)}
             >
               <Filter className="h-4 w-4 mr-2" />
@@ -167,9 +176,10 @@ const NewsGrid = ({
                 
                 <div className="max-h-60 overflow-y-auto">
                   <div 
-                    className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                    className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center"
                     onClick={() => handleCountrySelect('All')}
                   >
+                    <Globe className="h-4 w-4 mr-2 text-blue-500" />
                     All Countries
                   </div>
                   
@@ -177,9 +187,10 @@ const NewsGrid = ({
                     filteredCountries.map(country => (
                       <div
                         key={country}
-                        className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center"
                         onClick={() => handleCountrySelect(country)}
                       >
+                        {renderCountryFlag(country)}
                         {country}
                       </div>
                     ))
