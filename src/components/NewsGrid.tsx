@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NewsCard, { NewsItem } from './NewsCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
-import { Filter, RefreshCw } from 'lucide-react';
+import { Filter, RefreshCw, Search, X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Input } from './ui/input';
 
 interface NewsGridProps {
   news: NewsItem[];
@@ -23,11 +24,21 @@ const NewsGrid = ({
   onFilterByCountry 
 }: NewsGridProps) => {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showSearch, setShowSearch] = useState<boolean>(false);
   
+  // Get all unique countries from news items
   const countries = Array.from(new Set(news.map(item => item.country || 'Global'))).sort();
+  
+  // Filter countries based on search query
+  const filteredCountries = countries.filter(country => 
+    country.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   
   const handleCountrySelect = (country: string) => {
     setSelectedCountry(country === 'All' ? null : country);
+    setShowSearch(false);
+    setSearchQuery('');
     if (onFilterByCountry) {
       onFilterByCountry(country === 'All' ? '' : country);
     }
@@ -36,6 +47,21 @@ const NewsGrid = ({
   const filteredNews = selectedCountry 
     ? news.filter(item => item.country === selectedCountry) 
     : news;
+
+  // Close search when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.country-search-container') && !target.closest('.country-filter-btn')) {
+        setShowSearch(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -105,27 +131,67 @@ const NewsGrid = ({
             </Badge>
           )}
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter by Country
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleCountrySelect('All')}>
-                All Countries
-              </DropdownMenuItem>
-              {countries.map(country => (
-                <DropdownMenuItem
-                  key={country}
-                  onClick={() => handleCountrySelect(country)}
-                >
-                  {country}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="relative country-search-container">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="country-filter-btn"
+              onClick={() => setShowSearch(!showSearch)}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filter by Country
+            </Button>
+            
+            {showSearch && (
+              <div className="absolute right-0 top-full mt-2 w-64 rounded-md bg-white shadow-lg border border-gray-200 z-10 overflow-hidden">
+                <div className="p-2">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search country..."
+                      className="pl-8 text-sm"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                    />
+                    {searchQuery && (
+                      <button 
+                        className="absolute right-2 top-2.5"
+                        onClick={() => setSearchQuery('')}
+                      >
+                        <X className="h-4 w-4 text-gray-400" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="max-h-60 overflow-y-auto">
+                  <div 
+                    className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleCountrySelect('All')}
+                  >
+                    All Countries
+                  </div>
+                  
+                  {filteredCountries.length > 0 ? (
+                    filteredCountries.map(country => (
+                      <div
+                        key={country}
+                        className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleCountrySelect(country)}
+                      >
+                        {country}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500">
+                      No countries found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           
           {onRefresh && (
             <Button 
