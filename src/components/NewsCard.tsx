@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Clock, Bookmark, Share2, TrendingUp, TrendingDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import SourceBadge from './SourceBadge';
 
 export interface NewsItem {
   id: string;
@@ -81,14 +82,7 @@ const NewsCard = ({ news, index }: NewsCardProps) => {
         
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-medium text-gray-600">{news.source}</span>
-              <span className="text-gray-400">•</span>
-              <div className="flex items-center text-xs text-gray-500">
-                <Clock className="h-3 w-3 mr-1" />
-                {timeAgo(news.publishedAt)}
-              </div>
-            </div>
+            <SourceBadge source={news.source} showReliability />
             
             <div className={`flex items-center rounded-full px-2 py-0.5 text-xs ${sentimentColor()}`}>
               {sentimentIcon()}
@@ -104,7 +98,10 @@ const NewsCard = ({ news, index }: NewsCardProps) => {
           </p>
           
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <span className="text-sm font-medium text-blue-600">Read more</span>
+            <div className="flex items-center text-xs text-gray-500">
+              <Clock className="h-3 w-3 mr-1" />
+              {timeAgo(news.publishedAt)}
+            </div>
             
             <div className="flex items-center space-x-1">
               <Button variant="ghost" size="icon" className="h-8 w-8">

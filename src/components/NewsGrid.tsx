@@ -7,6 +7,7 @@ import { Filter, RefreshCw, Search, X, Globe, Flag } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Input } from './ui/input';
+import SourceFilter from './SourceFilter';
 
 interface NewsGridProps {
   news: NewsItem[];
@@ -24,11 +25,15 @@ const NewsGrid = ({
   onFilterByCountry 
 }: NewsGridProps) => {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearch, setShowSearch] = useState<boolean>(false);
   
   // Get all unique countries from news items
   const countries = Array.from(new Set(news.map(item => item.country || 'Global'))).sort();
+  
+  // Get all unique sources from news items
+  const sources = Array.from(new Set(news.map(item => item.source))).sort();
   
   // Filter countries based on search query
   const filteredCountries = countries.filter(country => 
@@ -44,15 +49,23 @@ const NewsGrid = ({
     }
   };
   
-  const filteredNews = selectedCountry 
-    ? news.filter(item => item.country === selectedCountry) 
-    : news;
+  const handleSourceSelect = (source: string) => {
+    setSelectedSource(source === 'All' ? null : source);
+  };
+  
+  // Apply both country and source filters
+  const filteredNews = news.filter(item => {
+    const matchesCountry = selectedCountry ? item.country === selectedCountry : true;
+    const matchesSource = selectedSource ? item.source === selectedSource : true;
+    return matchesCountry && matchesSource;
+  });
 
   // Close search when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.country-search-container') && !target.closest('.country-filter-btn')) {
+      if (!target.closest('.country-search-container') && !target.closest('.country-filter-btn') &&
+          !target.closest('.source-filter-container') && !target.closest('.source-filter-btn')) {
         setShowSearch(false);
       }
     };
@@ -126,7 +139,7 @@ const NewsGrid = ({
           </motion.h2>
         )}
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {selectedCountry && (
             <Badge variant="outline" className="animate-fadeIn flex items-center">
               {renderCountryFlag(selectedCountry)}
@@ -203,6 +216,12 @@ const NewsGrid = ({
               </div>
             )}
           </div>
+          
+          <SourceFilter 
+            sources={sources}
+            selectedSource={selectedSource}
+            onSourceSelect={handleSourceSelect}
+          />
           
           {onRefresh && (
             <Button 
