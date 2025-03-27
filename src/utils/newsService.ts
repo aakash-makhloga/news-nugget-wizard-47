@@ -1,16 +1,224 @@
 
 import { NewsItem } from '@/components/NewsCard';
 
-const API_BASE_URL = 'https://api.example.com/news'; // This would be replaced with a real API
+const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY || 'demo'; // Using a demo key as fallback
+const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
 
-// This simulates real-world API calls
+// Function to transform the NewsAPI response to our NewsItem format
+const transformNewsApiResponse = (articles: any[]): NewsItem[] => {
+  return articles.map((article, index) => ({
+    id: `${index}-${Date.now()}`, // Generate a unique ID
+    title: article.title || 'No title available',
+    summary: article.description || 'No description available',
+    source: article.source?.name || 'Unknown Source',
+    publishedAt: article.publishedAt || new Date().toISOString(),
+    imageUrl: article.urlToImage || 'https://via.placeholder.com/800x450?text=No+Image',
+    category: article.category || determineCategory(article.title, article.description),
+    sentiment: determineSentiment(article.title, article.description),
+    url: article.url || '#',
+    country: article.country || determineCountry(article.source?.name)
+  }));
+};
+
+// Helper function to determine category based on title and description
+const determineCategory = (title: string = '', description: string = ''): string => {
+  const content = (title + ' ' + description).toLowerCase();
+  
+  if (content.includes('bitcoin') || content.includes('crypto') || content.includes('blockchain')) {
+    return 'Cryptocurrency';
+  } else if (content.includes('stock') || content.includes('market') || content.includes('investment')) {
+    return 'Business';
+  } else if (content.includes('tech') || content.includes('ai') || content.includes('software')) {
+    return 'Technology';
+  } else if (content.includes('oil') || content.includes('gas') || content.includes('energy')) {
+    return 'Commodities';
+  } else if (content.includes('bank') || content.includes('interest rate') || content.includes('financial')) {
+    return 'Economy';
+  } else if (content.includes('climate') || content.includes('environment') || content.includes('sustainable')) {
+    return 'Environment';
+  } else {
+    return 'General';
+  }
+};
+
+// Helper function to determine sentiment based on title and description
+const determineSentiment = (title: string = '', description: string = ''): 'positive' | 'negative' | 'neutral' => {
+  const content = (title + ' ' + description).toLowerCase();
+  
+  const positiveWords = ['growth', 'increase', 'rise', 'gain', 'profit', 'success', 'positive', 'breakthrough'];
+  const negativeWords = ['decline', 'decrease', 'fall', 'loss', 'crisis', 'negative', 'crash', 'concern'];
+  
+  let positiveScore = 0;
+  let negativeScore = 0;
+  
+  positiveWords.forEach(word => {
+    if (content.includes(word)) positiveScore++;
+  });
+  
+  negativeWords.forEach(word => {
+    if (content.includes(word)) negativeScore++;
+  });
+  
+  if (positiveScore > negativeScore) return 'positive';
+  if (negativeScore > positiveScore) return 'negative';
+  return 'neutral';
+};
+
+// Helper function to determine country based on source name
+const determineCountry = (sourceName: string = ''): string => {
+  const sourceCountryMap: Record<string, string> = {
+    'BBC': 'United Kingdom',
+    'CNN': 'USA',
+    'Reuters': 'Global',
+    'Associated Press': 'USA',
+    'CNBC': 'USA',
+    'Bloomberg': 'USA',
+    'Financial Times': 'United Kingdom',
+    'The New York Times': 'USA',
+    'The Wall Street Journal': 'USA',
+    'The Guardian': 'United Kingdom',
+    'The Washington Post': 'USA'
+  };
+  
+  return sourceCountryMap[sourceName] || 'Global';
+};
+
 export const fetchLatestNews = async (): Promise<NewsItem[]> => {
+  try {
+    // Check if API key is provided
+    if (!NEWS_API_KEY || NEWS_API_KEY === 'demo') {
+      console.warn('No NEWS_API_KEY provided or using demo key. Falling back to mock data.');
+      return fetchMockNews();
+    }
+    
+    const response = await fetch(`${NEWS_API_BASE_URL}/top-headlines?language=en&apiKey=${NEWS_API_KEY}`);
+    
+    if (!response.ok) {
+      console.error('News API error:', response.status);
+      return fetchMockNews();
+    }
+    
+    const data = await response.json();
+    return transformNewsApiResponse(data.articles || []);
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    // Fallback to mock data in case of error
+    return fetchMockNews();
+  }
+};
+
+export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]> => {
+  try {
+    if (!NEWS_API_KEY || NEWS_API_KEY === 'demo') {
+      console.warn('No NEWS_API_KEY provided or using demo key. Falling back to mock data.');
+      const allNews = await fetchMockNews();
+      return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
+    }
+    
+    // For the NewsAPI, we'll use the 'q' parameter to search for category
+    const response = await fetch(
+      `${NEWS_API_BASE_URL}/everything?q=${category}&language=en&sortBy=publishedAt&apiKey=${NEWS_API_KEY}`
+    );
+    
+    if (!response.ok) {
+      console.error('News API error:', response.status);
+      const allNews = await fetchMockNews();
+      return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
+    }
+    
+    const data = await response.json();
+    const transformedNews = transformNewsApiResponse(data.articles || []);
+    
+    // Override the category
+    transformedNews.forEach(news => {
+      news.category = category;
+    });
+    
+    return transformedNews;
+  } catch (error) {
+    console.error('Error fetching news by category:', error);
+    // Fallback to mock data
+    const allNews = await fetchMockNews();
+    return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
+  }
+};
+
+export const fetchNewsByCountry = async (country: string): Promise<NewsItem[]> => {
+  try {
+    if (!NEWS_API_KEY || NEWS_API_KEY === 'demo') {
+      console.warn('No NEWS_API_KEY provided or using demo key. Falling back to mock data.');
+      const allNews = await fetchMockNews();
+      return country 
+        ? allNews.filter(news => news.country === country)
+        : allNews;
+    }
+    
+    // Map country names to ISO country codes for the NewsAPI
+    const countryCodeMap: Record<string, string> = {
+      'USA': 'us',
+      'United Kingdom': 'gb',
+      'Global': '',
+      'Japan': 'jp',
+      'India': 'in',
+      'China': 'cn',
+      'Brazil': 'br',
+      'European Union': 'de' // Using Germany as a proxy for EU
+    };
+    
+    const countryCode = countryCodeMap[country] || '';
+    
+    // If no specific country is requested or not supported, fetch top headlines
+    if (!country || !countryCode) {
+      return fetchLatestNews();
+    }
+    
+    const response = await fetch(
+      `${NEWS_API_BASE_URL}/top-headlines?country=${countryCode}&language=en&apiKey=${NEWS_API_KEY}`
+    );
+    
+    if (!response.ok) {
+      console.error('News API error:', response.status);
+      const allNews = await fetchMockNews();
+      return country 
+        ? allNews.filter(news => news.country === country)
+        : allNews;
+    }
+    
+    const data = await response.json();
+    const transformedNews = transformNewsApiResponse(data.articles || []);
+    
+    // Override the country
+    transformedNews.forEach(news => {
+      news.country = country;
+    });
+    
+    return transformedNews;
+  } catch (error) {
+    console.error('Error fetching news by country:', error);
+    // Fallback to mock data
+    const allNews = await fetchMockNews();
+    return country 
+      ? allNews.filter(news => news.country === country)
+      : allNews;
+  }
+};
+
+export const fetchNewsById = async (id: string): Promise<NewsItem | null> => {
+  // For NewsAPI, we don't have a direct way to fetch by ID
+  // So we fetch all news and find the one with matching ID
+  try {
+    const allNews = await fetchLatestNews();
+    return allNews.find(news => news.id === id) || null;
+  } catch (error) {
+    console.error('Error fetching news by ID:', error);
+    return null;
+  }
+};
+
+// The original mock news function
+const fetchMockNews = async (): Promise<NewsItem[]> => {
   // Simulating API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // In production, this would be an actual API call like:
-  // const response = await fetch(`${API_BASE_URL}/latest`);
-  // return await response.json();
   
   return [
     {
@@ -158,42 +366,4 @@ export const fetchLatestNews = async (): Promise<NewsItem[]> => {
       country: 'Brazil'
     }
   ];
-};
-
-export const fetchNewsById = async (id: string): Promise<NewsItem | null> => {
-  // Simulating API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // In production, this would be:
-  // const response = await fetch(`${API_BASE_URL}/news/${id}`);
-  // return await response.json();
-  
-  const allNews = await fetchLatestNews();
-  return allNews.find(news => news.id === id) || null;
-};
-
-export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]> => {
-  // Simulating API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // In production, this would be:
-  // const response = await fetch(`${API_BASE_URL}/news/category/${category}`);
-  // return await response.json();
-  
-  const allNews = await fetchLatestNews();
-  return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
-};
-
-export const fetchNewsByCountry = async (country: string): Promise<NewsItem[]> => {
-  // Simulating API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // In production, this would be:
-  // const response = await fetch(`${API_BASE_URL}/news/country/${country}`);
-  // return await response.json();
-  
-  const allNews = await fetchLatestNews();
-  return country 
-    ? allNews.filter(news => news.country === country)
-    : allNews;
 };
