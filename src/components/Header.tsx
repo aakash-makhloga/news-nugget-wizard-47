@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -81,19 +80,6 @@ const Header = () => {
                       )}
                     >
                       Home
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <Link to="/get-started">
-                    <NavigationMenuLink 
-                      className={cn(
-                        "px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100",
-                        location.pathname === "/get-started" && "bg-gray-100"
-                      )}
-                    >
-                      Get Started
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
@@ -375,7 +361,6 @@ const Header = () => {
             </div>
             <nav className="flex flex-col space-y-2">
               <Link to="/" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/" ? "bg-gray-100" : ""}`}>Home</Link>
-              <Link to="/get-started" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/get-started" ? "bg-gray-100" : ""}`}>Get Started</Link>
               <Link to="/markets" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/markets" ? "bg-gray-100" : ""}`}>Markets</Link>
               <Link to="/stocks" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/stocks" ? "bg-gray-100" : ""}`}>Stocks</Link>
               <Link to="/learn" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/learn" ? "bg-gray-100" : ""}`}>Learn</Link>
