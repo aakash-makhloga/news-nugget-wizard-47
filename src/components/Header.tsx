@@ -6,6 +6,8 @@ import { Search, Bell, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNotifications } from '@/hooks/useNotifications';
+import NotificationPanel from '@/components/NotificationPanel';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,6 +23,15 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
+  const { 
+    notifications, 
+    unreadCount, 
+    isNotificationPanelOpen, 
+    toggleNotificationPanel,
+    setIsNotificationPanelOpen,
+    markAllAsRead,
+    clearAllNotifications
+  } = useNotifications();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,7 +47,8 @@ const Header = () => {
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
-  }, [location]);
+    setIsNotificationPanelOpen(false);
+  }, [location, setIsNotificationPanelOpen]);
 
   return (
     <header 
@@ -69,6 +81,19 @@ const Header = () => {
                       )}
                     >
                       Home
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                
+                <NavigationMenuItem>
+                  <Link to="/get-started">
+                    <NavigationMenuLink 
+                      className={cn(
+                        "px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100",
+                        location.pathname === "/get-started" && "bg-gray-100"
+                      )}
+                    >
+                      Get Started
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
@@ -307,9 +332,15 @@ const Header = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-gray-100 relative"
+            onClick={toggleNotificationPanel}
           >
             <Bell className="h-5 w-5 text-gray-600" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center transform translate-x-1 -translate-y-1">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </motion.button>
           
           {isMobile && (
@@ -344,6 +375,7 @@ const Header = () => {
             </div>
             <nav className="flex flex-col space-y-2">
               <Link to="/" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/" ? "bg-gray-100" : ""}`}>Home</Link>
+              <Link to="/get-started" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/get-started" ? "bg-gray-100" : ""}`}>Get Started</Link>
               <Link to="/markets" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/markets" ? "bg-gray-100" : ""}`}>Markets</Link>
               <Link to="/stocks" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/stocks" ? "bg-gray-100" : ""}`}>Stocks</Link>
               <Link to="/learn" className={`px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${location.pathname === "/learn" ? "bg-gray-100" : ""}`}>Learn</Link>
@@ -353,6 +385,15 @@ const Header = () => {
           </div>
         </motion.div>
       )}
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={isNotificationPanelOpen}
+        onClose={() => setIsNotificationPanelOpen(false)}
+        notifications={notifications}
+        onMarkAllAsRead={markAllAsRead}
+        onClearAll={clearAllNotifications}
+      />
     </header>
   );
 };

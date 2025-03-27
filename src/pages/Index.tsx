@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Loader2, ChevronRight, ArrowRight, TrendingUp, Newspaper, BarChart2, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -112,9 +112,11 @@ const Index = () => {
                   Complex business news explained simply. Stay informed with AI-powered insights on what really matters for your financial decisions.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <Button size="lg" className="font-medium px-8">
-                    Get Started
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button size="lg" className="font-medium px-8" asChild>
+                    <Link to="/get-started">
+                      Get Started
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
