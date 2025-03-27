@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Loader2, ChevronRight, ArrowRight, TrendingUp, Newspaper, BarChart2, Globe } from 'lucide-react';
+import { Loader2, ChevronRight, ArrowRight, TrendingUp, Newspaper, BarChart2, Globe, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -10,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Header from '@/components/Header';
 import StockTicker from '@/components/StockTicker';
 import NewsGrid from '@/components/NewsGrid';
@@ -27,6 +29,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [activeTab, setActiveTab] = useState('all');
+  const [usingMockData, setUsingMockData] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -40,6 +43,12 @@ const Index = () => {
       }
       
       setLatestNews(news);
+      
+      // Check if we're using mock data by looking at the first news item's ID
+      // Real news from API would have a generated ID with timestamp
+      if (news.length > 0) {
+        setUsingMockData(news[0].id.length < 10); // Simple heuristic to detect mock data
+      }
       
       // Generate featured analysis for the first news item
       if (news.length > 0) {
@@ -96,6 +105,20 @@ const Index = () => {
       <Header />
       
       <main className="flex-grow pt-16">
+        {/* API Key Alert */}
+        {usingMockData && (
+          <div className="container px-4 md:px-6 mx-auto mt-8">
+            <Alert variant="warning" className="bg-amber-50 border-amber-200">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <AlertTitle className="text-amber-800">Using sample news data</AlertTitle>
+              <AlertDescription className="text-amber-700">
+                To display real news, add your News API key as VITE_NEWS_API_KEY in environment variables.
+                Get an API key at <a href="https://newsapi.org" target="_blank" rel="noopener noreferrer" className="underline">newsapi.org</a>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+        
         {/* Hero section */}
         <section className="relative bg-gradient-to-b from-blue-50 to-white">
           <div className="container px-4 md:px-6 mx-auto pt-16 pb-16 md:pt-20 md:pb-24">
