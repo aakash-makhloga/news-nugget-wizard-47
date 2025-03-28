@@ -106,7 +106,11 @@ function dispatch(action: ToastAction) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id">
+// Extended Toast type with the missing properties
+type Toast = Omit<ToasterToast, "id"> & {
+  variant?: "default" | "destructive" | string
+  duration?: number
+}
 
 function toast({ ...props }: Toast) {
   const id = generateId()

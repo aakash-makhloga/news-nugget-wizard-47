@@ -122,6 +122,8 @@ export type ToasterToast = {
   action?: ToastActionElement
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  variant?: "default" | "destructive" | string
+  duration?: number
 }
 
 export {
