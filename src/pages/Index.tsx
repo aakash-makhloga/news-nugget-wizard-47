@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -44,13 +43,10 @@ const Index = () => {
       
       setLatestNews(news);
       
-      // Check if we're using mock data by looking at the first news item's ID
-      // Real news from API would have a generated ID with timestamp
       if (news.length > 0) {
-        setUsingMockData(news[0].id.length < 10); // Simple heuristic to detect mock data
+        setUsingMockData(news[0].id.length < 10);
       }
       
-      // Generate featured analysis for the first news item
       if (news.length > 0) {
         const analysis = await generateNewsAnalysis(news[0].id);
         setFeaturedAnalysis({
