@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 const NotificationCenter = () => {
-  const { notifications, markAllAsRead, dismissNotification, unreadCount } = useNotifications();
+  const { notifications, markAllAsRead, markAsRead, unreadCount } = useNotifications();
   const { toast } = useToast();
   
   const handleMarkAllAsRead = () => {
@@ -91,7 +91,7 @@ const NotificationCenter = () => {
                       variant="ghost" 
                       size="icon" 
                       className="h-6 w-6"
-                      onClick={() => dismissNotification(notification.id)}
+                      onClick={() => markAsRead(notification.id)}
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -99,7 +99,7 @@ const NotificationCenter = () => {
                   <p className="text-xs text-muted-foreground pl-6">{notification.message}</p>
                   <div className="w-full flex items-center justify-between mt-2 pl-6">
                     <span className="text-xs text-muted-foreground">
-                      {new Date(notification.timestamp).toLocaleString()}
+                      {new Date(notification.time).toLocaleString()}
                     </span>
                     {!notification.read && (
                       <Badge variant="secondary" className="text-xs h-5 bg-blue-100 text-blue-800">New</Badge>
