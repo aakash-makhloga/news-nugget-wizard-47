@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -110,6 +111,7 @@ const Index = () => {
             title="Using demo news data"
             description="This application is showing sample financial news for demonstration purposes."
             onRetry={handleRefresh}
+            autoCloseAfter={300000} // 5 minutes in milliseconds
           />
         </div>
         
