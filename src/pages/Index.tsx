@@ -21,6 +21,7 @@ import { NewsItem } from '@/components/NewsCard';
 import { fetchPopularStocks } from '@/utils/stocksService';
 import { generateNewsAnalysis } from '@/utils/aiService';
 import { toast } from '@/components/ui/use-toast';
+import ApiErrorAlert from '@/components/ApiErrorAlert';
 
 const Index = () => {
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
@@ -29,10 +30,12 @@ const Index = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [activeTab, setActiveTab] = useState('all');
   const [usingMockData, setUsingMockData] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setApiError(null);
       
       let news;
       if (selectedCountry) {
@@ -62,12 +65,18 @@ const Index = () => {
       });
     } catch (error) {
       console.error('Error loading data:', error);
-      toast({
-        title: "Error loading news",
-        description: "There was a problem fetching the latest news. Please try again.",
-        variant: "destructive",
-        duration: 5000,
-      });
+      
+      if (error instanceof Error && error.message.includes('CORS')) {
+        setApiError('CORS error: Browser requests are not allowed on the Developer plan.');
+      } else {
+        setApiError(null);
+        toast({
+          title: "Error loading news",
+          description: "There was a problem fetching the latest news. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -101,17 +110,14 @@ const Index = () => {
       <Header />
       
       <main className="flex-grow pt-16">
-        {/* API Key Alert */}
-        {usingMockData && (
+        {/* API Error Alert */}
+        {(usingMockData || apiError) && (
           <div className="container px-4 md:px-6 mx-auto mt-8">
-            <Alert variant="warning" className="bg-amber-50 border-amber-200">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <AlertTitle className="text-amber-800">Using sample news data</AlertTitle>
-              <AlertDescription className="text-amber-700">
-                To display real news, add your News API key as VITE_NEWS_API_KEY in environment variables.
-                Get an API key at <a href="https://newsapi.org" target="_blank" rel="noopener noreferrer" className="underline">newsapi.org</a>
-              </AlertDescription>
-            </Alert>
+            <ApiErrorAlert 
+              title={apiError ? "API Access Restricted" : "Using sample news data"}
+              description={apiError || "To display real news with your API key, you need to either run locally or upgrade to a paid plan that allows CORS."}
+              onRetry={handleRefresh}
+            />
           </div>
         )}
         

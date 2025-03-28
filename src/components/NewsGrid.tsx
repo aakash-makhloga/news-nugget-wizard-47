@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import NewsCard, { NewsItem } from './NewsCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
-import { Filter, RefreshCw, Search, X, Globe, Flag } from 'lucide-react';
+import { Filter, RefreshCw, Search, X, Globe, Flag, Loader2 } from 'lucide-react';
 import { Badge } from './ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Input } from './ui/input';
 import SourceFilter from './SourceFilter';
+import { toast } from '@/components/ui/use-toast';
 
 interface NewsGridProps {
   news: NewsItem[];
@@ -29,13 +28,9 @@ const NewsGrid = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearch, setShowSearch] = useState<boolean>(false);
   
-  // Get all unique countries from news items
   const countries = Array.from(new Set(news.map(item => item.country || 'Global'))).sort();
-  
-  // Get all unique sources from news items
   const sources = Array.from(new Set(news.map(item => item.source))).sort();
   
-  // Filter countries based on search query
   const filteredCountries = countries.filter(country => 
     country.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -44,23 +39,30 @@ const NewsGrid = ({
     setSelectedCountry(country === 'All' ? null : country);
     setShowSearch(false);
     setSearchQuery('');
+    
     if (onFilterByCountry) {
       onFilterByCountry(country === 'All' ? '' : country);
+      toast({
+        title: `Filtered by ${country === 'All' ? 'all countries' : country}`,
+        duration: 2000,
+      });
     }
   };
   
   const handleSourceSelect = (source: string) => {
     setSelectedSource(source === 'All' ? null : source);
+    toast({
+      title: `Filtered by ${source === 'All' ? 'all sources' : source}`,
+      duration: 2000,
+    });
   };
   
-  // Apply both country and source filters
   const filteredNews = news.filter(item => {
     const matchesCountry = selectedCountry ? item.country === selectedCountry : true;
     const matchesSource = selectedSource ? item.source === selectedSource : true;
     return matchesCountry && matchesSource;
   });
 
-  // Close search when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -76,7 +78,6 @@ const NewsGrid = ({
     };
   }, []);
 
-  // Function to render country flag icon
   const renderCountryFlag = (country: string) => {
     if (country === 'All' || country === 'Global') {
       return <Globe className="h-4 w-4 mr-2 text-blue-500" />;
@@ -88,6 +89,10 @@ const NewsGrid = ({
     return (
       <div className="space-y-6">
         {title && <h2 className="text-2xl font-medium">{title}</h2>}
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500 mr-3" />
+          <span className="text-lg text-gray-600">Loading news...</span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, index) => (
             <div key={index} className="rounded-xl overflow-hidden bg-gray-100 animate-pulse">
