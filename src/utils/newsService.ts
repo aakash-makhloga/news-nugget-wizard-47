@@ -1,6 +1,7 @@
 import { NewsItem } from '@/components/NewsCard';
 
-const NEWS_API_KEY = '97c943fd7ff34c8ab14dd0384f5521a3'; // Using the provided API key
+// Using empty API key as we're not making real API calls
+const NEWS_API_KEY = '';
 const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
 
 // Function to transform the NewsAPI response to our NewsItem format
@@ -83,122 +84,35 @@ const determineCountry = (sourceName: string = ''): string => {
 };
 
 export const fetchLatestNews = async (): Promise<NewsItem[]> => {
-  try {
-    // Using the real API key to fetch news
-    console.log('Fetching real news from NewsAPI');
-    const response = await fetch(`${NEWS_API_BASE_URL}/top-headlines?language=en&apiKey=${NEWS_API_KEY}`);
-    
-    if (response.ok) {
-      const data = await response.json();
-      return transformNewsApiResponse(data.articles || []);
-    }
-    
-    console.error('News API error:', response.status);
-    
-    // Fall back to mock data if request fails
-    return fetchMockNews();
-  } catch (error) {
-    console.error('Error fetching news:', error);
-    // Fallback to mock data in case of error
-    return fetchMockNews();
-  }
+  console.log('Using mock news data instead of real API');
+  return fetchMockNews();
 };
 
 export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]> => {
-  try {
-    console.log('Fetching news by category from NewsAPI:', category);
-    
-    // For the NewsAPI, we'll use the 'q' parameter to search for category
-    const response = await fetch(
-      `${NEWS_API_BASE_URL}/everything?q=${category}&language=en&sortBy=publishedAt&apiKey=${NEWS_API_KEY}`
-    );
-    
-    if (response.ok) {
-      const data = await response.json();
-      const transformedNews = transformNewsApiResponse(data.articles || []);
-      
-      // Override the category
-      transformedNews.forEach(news => {
-        news.category = category;
-      });
-      
-      return transformedNews;
-    }
-    
-    console.error('News API error:', response.status);
-    
-    // Fallback to mock data
-    const allNews = await fetchMockNews();
-    return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
-  } catch (error) {
-    console.error('Error fetching news by category:', error);
-    // Fallback to mock data
-    const allNews = await fetchMockNews();
-    return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
-  }
+  console.log('Using mock news data for category:', category);
+  
+  // Get all mock news
+  const allNews = await fetchMockNews();
+  
+  // Filter by category
+  return allNews.filter(news => news.category.toLowerCase() === category.toLowerCase());
 };
 
 export const fetchNewsByCountry = async (country: string): Promise<NewsItem[]> => {
-  try {
-    console.log('Fetching news by country from NewsAPI:', country);
-    
-    // Map country names to ISO country codes for the NewsAPI
-    const countryCodeMap: Record<string, string> = {
-      'USA': 'us',
-      'United Kingdom': 'gb',
-      'Global': '',
-      'Japan': 'jp',
-      'India': 'in',
-      'China': 'cn',
-      'Brazil': 'br',
-      'European Union': 'de' // Using Germany as a proxy for EU
-    };
-    
-    const countryCode = countryCodeMap[country] || '';
-    
-    // If no specific country is requested or not supported, fetch top headlines
-    if (!country || !countryCode) {
-      return fetchLatestNews();
-    }
-    
-    const response = await fetch(
-      `${NEWS_API_BASE_URL}/top-headlines?country=${countryCode}&language=en&apiKey=${NEWS_API_KEY}`
-    );
-    
-    if (response.ok) {
-      const data = await response.json();
-      const transformedNews = transformNewsApiResponse(data.articles || []);
-      
-      // Override the country
-      transformedNews.forEach(news => {
-        news.country = country;
-      });
-      
-      return transformedNews;
-    }
-    
-    console.error('News API error:', response.status);
-    
-    // Fallback to mock data
-    const allNews = await fetchMockNews();
-    return country 
-      ? allNews.filter(news => news.country === country)
-      : allNews;
-  } catch (error) {
-    console.error('Error fetching news by country:', error);
-    // Fallback to mock data
-    const allNews = await fetchMockNews();
-    return country 
-      ? allNews.filter(news => news.country === country)
-      : allNews;
-  }
+  console.log('Using mock news data for country:', country);
+  
+  // Get all mock news
+  const allNews = await fetchMockNews();
+  
+  // Filter by country if specified
+  return country 
+    ? allNews.filter(news => news.country === country)
+    : allNews;
 };
 
 export const fetchNewsById = async (id: string): Promise<NewsItem | null> => {
-  // For NewsAPI, we don't have a direct way to fetch by ID
-  // So we fetch all news and find the one with matching ID
   try {
-    const allNews = await fetchLatestNews();
+    const allNews = await fetchMockNews();
     return allNews.find(news => news.id === id) || null;
   } catch (error) {
     console.error('Error fetching news by ID:', error);

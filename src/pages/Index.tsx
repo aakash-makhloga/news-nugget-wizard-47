@@ -29,7 +29,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [activeTab, setActiveTab] = useState('all');
-  const [usingMockData, setUsingMockData] = useState(false);
+  const [usingMockData, setUsingMockData] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
@@ -46,9 +46,7 @@ const Index = () => {
       
       setLatestNews(news);
       
-      if (news.length > 0) {
-        setUsingMockData(news[0].id.length < 10);
-      }
+      setUsingMockData(true);
       
       if (news.length > 0) {
         const analysis = await generateNewsAnalysis(news[0].id);
@@ -59,24 +57,20 @@ const Index = () => {
       }
       
       toast({
-        title: "Latest news loaded",
-        description: "The news feed has been updated with the latest stories.",
+        title: "News data loaded",
+        description: "The news feed has been updated with sample stories.",
         duration: 3000,
       });
     } catch (error) {
       console.error('Error loading data:', error);
       
-      if (error instanceof Error && error.message.includes('CORS')) {
-        setApiError('CORS error: Browser requests are not allowed on the Developer plan.');
-      } else {
-        setApiError(null);
-        toast({
-          title: "Error loading news",
-          description: "There was a problem fetching the latest news. Please try again.",
-          variant: "destructive",
-          duration: 5000,
-        });
-      }
+      setApiError("Could not load news data. Using sample data instead.");
+      toast({
+        title: "Error loading news",
+        description: "There was a problem fetching the latest news. Using sample data instead.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setLoading(false);
     }
@@ -110,16 +104,14 @@ const Index = () => {
       <Header />
       
       <main className="flex-grow pt-16">
-        {/* API Error Alert */}
-        {(usingMockData || apiError) && (
-          <div className="container px-4 md:px-6 mx-auto mt-8">
-            <ApiErrorAlert 
-              title={apiError ? "API Access Restricted" : "Using sample news data"}
-              description={apiError || "To display real news with your API key, you need to either run locally or upgrade to a paid plan that allows CORS."}
-              onRetry={handleRefresh}
-            />
-          </div>
-        )}
+        {/* Demo Data Alert */}
+        <div className="container px-4 md:px-6 mx-auto mt-8">
+          <ApiErrorAlert 
+            title="Using demo news data"
+            description="This application is showing sample financial news for demonstration purposes."
+            onRetry={handleRefresh}
+          />
+        </div>
         
         {/* Hero section */}
         <section className="relative bg-gradient-to-b from-blue-50 to-white">

@@ -13,8 +13,8 @@ interface ApiErrorAlertProps {
 
 const ApiErrorAlert = ({
   title = "Using sample news data",
-  description = "The News API has CORS restrictions on browser requests in the Developer plan.",
-  showDocLink = true,
+  description = "This application is currently using demo data instead of real-time news.",
+  showDocLink = false,
   onRetry
 }: ApiErrorAlertProps) => {
   return (
@@ -31,7 +31,7 @@ const ApiErrorAlert = ({
         {onRetry && (
           <div className="mt-2">
             <Button variant="outline" size="sm" onClick={onRetry} className="bg-white hover:bg-amber-50">
-              Retry
+              Refresh Data
             </Button>
           </div>
         )}
