@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -122,7 +121,7 @@ export type ToasterToast = {
   action?: ToastActionElement
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  variant?: "default" | "destructive" | string
+  variant?: "default" | "destructive"
   duration?: number
 }
 

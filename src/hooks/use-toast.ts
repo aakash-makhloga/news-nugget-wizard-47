@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { type Toast, type ToasterToast } from "@/components/ui/toast"
 
@@ -108,7 +107,7 @@ function dispatch(action: ToastAction) {
 
 // Extended Toast type with the missing properties
 type Toast = Omit<ToasterToast, "id"> & {
-  variant?: "default" | "destructive" | string
+  variant?: "default" | "destructive"
   duration?: number
 }
 
