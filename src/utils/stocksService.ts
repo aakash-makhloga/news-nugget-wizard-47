@@ -1,4 +1,3 @@
-
 // This would be replaced with real API calls in production
 export interface StockData {
   symbol: string;
@@ -207,3 +206,19 @@ function generateMockHistory(currentPrice: number) {
   
   return history.reverse(); // Most recent last
 }
+
+// Add function to search for stocks by partial symbol or name
+export const searchStocks = async (query: string): Promise<StockData[]> => {
+  // Simulating API call delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  if (!query || query.length < 2) return [];
+  
+  const allStocks = await fetchPopularStocks();
+  const lowerQuery = query.toLowerCase();
+  
+  return allStocks.filter(stock => 
+    stock.symbol.toLowerCase().includes(lowerQuery) || 
+    stock.name.toLowerCase().includes(lowerQuery)
+  );
+};

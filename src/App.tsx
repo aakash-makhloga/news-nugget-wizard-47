@@ -1,47 +1,39 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
-import Index from "./pages/Index";
-import NewsDetail from "./pages/NewsDetail";
-import NotFound from "./pages/NotFound";
-import Markets from "./pages/Markets";
-import Stocks from "./pages/Stocks";
-import Learn from "./pages/Learn";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import GetStarted from "./pages/GetStarted";
-import Notifications from "./pages/Notifications";
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Toaster } from '@/components/ui/toaster'
+import Index from '@/pages/Index'
+import About from '@/pages/About'
+import Contact from '@/pages/Contact'
+import Markets from '@/pages/Markets'
+import GetStarted from '@/pages/GetStarted'
+import Learn from '@/pages/Learn'
+import NewsDetail from '@/pages/NewsDetail'
+import Stocks from '@/pages/Stocks'
+import NotFound from '@/pages/NotFound'
+import Notifications from '@/pages/Notifications'
+import Portfolio from '@/pages/Portfolio'
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/markets" element={<Markets />} />
+        <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/learn" element={<Learn />} />
+        <Route path="/news/:id" element={<NewsDetail />} />
+        <Route path="/stocks" element={<Stocks />} />
+        <Route path="/stocks/:symbol" element={<Stocks />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AnimatePresence mode="wait">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/news/:id" element={<NewsDetail />} />
-            <Route path="/markets" element={<Markets />} />
-            <Route path="/stocks" element={<Stocks />} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/get-started" element={<GetStarted />} />
-            <Route path="/notifications" element={<Notifications />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AnimatePresence>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </Router>
+  )
+}
 
-export default App;
+export default App
