@@ -3,8 +3,6 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import Index from '@/pages/Index'
-import About from '@/pages/About'
-import Contact from '@/pages/Contact'
 import Markets from '@/pages/Markets'
 import GetStarted from '@/pages/GetStarted'
 import Learn from '@/pages/Learn'
@@ -23,8 +21,6 @@ const App = () => {
         <AlertsChecker />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
           <Route path="/markets" element={<Markets />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/learn" element={<Learn />} />

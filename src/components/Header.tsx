@@ -44,8 +44,7 @@ const Header = () => {
     { name: 'Markets', path: '/markets' },
     { name: 'Stocks', path: '/stocks' },
     { name: 'Learn', path: '/learn' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Portfolio', path: '/portfolio' },
   ];
   
   return (

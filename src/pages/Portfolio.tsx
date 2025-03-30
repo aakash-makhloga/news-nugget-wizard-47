@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -35,6 +34,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewsCard from '@/components/NewsCard';
 import ApiErrorAlert from '@/components/ApiErrorAlert';
+import PortfolioGuide from '@/components/PortfolioGuide';
 import { getPortfolio, addStockToPortfolio, removeStockFromPortfolio, getPortfolioValuation, getRelevantNewsForPortfolio } from '@/utils/portfolioService';
 import { fetchLatestNews } from '@/utils/newsService';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -164,10 +164,10 @@ const Portfolio = () => {
               <div>
                 <h1 className="text-3xl font-display font-medium mb-2 flex items-center">
                   <Briefcase className="mr-3 h-6 w-6 text-blue-600" />
-                  My Portfolio
+                  मेरा पोर्टफोलियो
                 </h1>
                 <p className="text-gray-600">
-                  Track your investments and monitor relevant news
+                  अपने निवेशों को ट्रैक करें और संबंधित समाचार देखें
                 </p>
               </div>
               
@@ -176,14 +176,14 @@ const Portfolio = () => {
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Stock
+                      स्टॉक जोड़ें
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Add Stock to Portfolio</DialogTitle>
+                      <DialogTitle>पोर्टफोलियो में स्टॉक जोड़ें</DialogTitle>
                       <DialogDescription>
-                        Enter the details of the stock you want to add to your portfolio.
+                        उस स्टॉक का विवरण दर्ज करें जिसे आप अपने पोर्टफोलियो में जोड़ना चाहते हैं।
                       </DialogDescription>
                     </DialogHeader>
                     
@@ -194,12 +194,12 @@ const Portfolio = () => {
                           name="symbol"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Stock Symbol</FormLabel>
+                              <FormLabel>स्टॉक सिंबल</FormLabel>
                               <FormControl>
                                 <Input placeholder="AAPL" {...field} />
                               </FormControl>
                               <FormDescription>
-                                Enter the ticker symbol (e.g., AAPL for Apple)
+                                टिकर सिंबल दर्ज करें (उदाहरण, Apple के लिए AAPL)
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -211,7 +211,7 @@ const Portfolio = () => {
                           name="shares"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Number of Shares</FormLabel>
+                              <FormLabel>शेयरों की संख्या</FormLabel>
                               <FormControl>
                                 <Input type="number" min="0.01" step="0.01" {...field} />
                               </FormControl>
@@ -225,7 +225,7 @@ const Portfolio = () => {
                           name="purchasePrice"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Purchase Price (per share)</FormLabel>
+                              <FormLabel>खरीद मूल्य (प्रति शेयर)</FormLabel>
                               <FormControl>
                                 <Input type="number" min="0.01" step="0.01" {...field} />
                               </FormControl>
@@ -239,7 +239,7 @@ const Portfolio = () => {
                           name="purchaseDate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Purchase Date</FormLabel>
+                              <FormLabel>खरीद तिथि</FormLabel>
                               <FormControl>
                                 <Input type="date" {...field} />
                               </FormControl>
@@ -249,7 +249,7 @@ const Portfolio = () => {
                         />
                         
                         <DialogFooter>
-                          <Button type="submit">Add to Portfolio</Button>
+                          <Button type="submit">पोर्टफोलियो में जोड़ें</Button>
                         </DialogFooter>
                       </form>
                     </Form>
@@ -260,22 +260,24 @@ const Portfolio = () => {
                   {refreshing ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Updating...
+                      अपडेट हो रहा है...
                     </>
                   ) : (
                     <>
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Refresh
+                      रिफ्रेश करें
                     </>
                   )}
                 </Button>
               </div>
             </div>
             
+            <PortfolioGuide />
+            
             {loading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500 mr-3" />
-                <span className="text-lg text-gray-600">Loading portfolio data...</span>
+                <span className="text-lg text-gray-600">पोर्टफोलियो डेटा लोड हो रहा है...</span>
               </div>
             ) : (
               <>
@@ -345,11 +347,11 @@ const Portfolio = () => {
                   <TabsList className="mb-6">
                     <TabsTrigger value="stocks" className="flex items-center">
                       <Briefcase className="h-4 w-4 mr-2" />
-                      My Stocks
+                      मेरे स्टॉक्स
                     </TabsTrigger>
                     <TabsTrigger value="news" className="flex items-center">
                       <Newspaper className="h-4 w-4 mr-2" />
-                      Related News
+                      संबंधित समाचार
                       {relevantNews.length > 0 && (
                         <Badge className="ml-2 bg-blue-100 text-blue-800">{relevantNews.length}</Badge>
                       )}
