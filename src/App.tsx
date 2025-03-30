@@ -13,26 +13,31 @@ import Stocks from '@/pages/Stocks'
 import NotFound from '@/pages/NotFound'
 import Notifications from '@/pages/Notifications'
 import Portfolio from '@/pages/Portfolio'
+import ThemeProvider from '@/components/ThemeProvider'
+import AlertsChecker from '@/components/AlertsChecker'
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/markets" element={<Markets />} />
-        <Route path="/get-started" element={<GetStarted />} />
-        <Route path="/learn" element={<Learn />} />
-        <Route path="/news/:id" element={<NewsDetail />} />
-        <Route path="/stocks" element={<Stocks />} />
-        <Route path="/stocks/:symbol" element={<Stocks />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AlertsChecker />
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/markets" element={<Markets />} />
+          <Route path="/get-started" element={<GetStarted />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/stocks" element={<Stocks />} />
+          <Route path="/stocks/:symbol" element={<Stocks />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </Router>
+    </ThemeProvider>
   )
 }
 

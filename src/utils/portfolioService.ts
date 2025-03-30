@@ -135,3 +135,42 @@ export const getRelevantNewsForPortfolio = (news: any[], portfolio: Portfolio): 
     );
   });
 };
+
+// Generate summarized data about the portfolio
+export const getPortfolioSummary = (portfolioData: any) => {
+  if (!portfolioData) return null;
+  
+  const { stocks, totalValue, totalGainLoss, totalGainLossPercent } = portfolioData;
+  
+  // Get sector breakdown
+  const sectorBreakdown: Record<string, number> = {};
+  let totalSectorValue = 0;
+  
+  stocks.forEach((stock: any) => {
+    const sector = stock.stockData?.sector || 'Uncategorized';
+    sectorBreakdown[sector] = (sectorBreakdown[sector] || 0) + stock.value;
+    totalSectorValue += stock.value;
+  });
+  
+  // Convert to percentages
+  const sectorAllocation = Object.entries(sectorBreakdown).map(([sector, value]) => ({
+    sector,
+    value,
+    percentage: (value / totalSectorValue) * 100
+  }));
+  
+  // Find best and worst performers
+  const sortedByPerformance = [...stocks].sort((a, b) => b.gainLossPercent - a.gainLossPercent);
+  const bestPerformer = sortedByPerformance[0];
+  const worstPerformer = sortedByPerformance[sortedByPerformance.length - 1];
+  
+  return {
+    totalValue,
+    totalGainLoss,
+    totalGainLossPercent,
+    sectorAllocation,
+    bestPerformer,
+    worstPerformer,
+    stockCount: stocks.length
+  };
+};
