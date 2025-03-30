@@ -17,10 +17,10 @@ const ApiErrorAlert = ({
   description = "This application is currently using demo data instead of real-time news.",
   showDocLink = false,
   onRetry,
-  autoCloseAfter = 300000 // Default to 5 minutes
+  autoCloseAfter = 5000 // Default to 5 seconds
 }: ApiErrorAlertProps) => {
   const [visible, setVisible] = useState(true);
-  const [timeLeft, setTimeLeft] = useState<number | null>(autoCloseAfter ? Math.floor(autoCloseAfter / 60000) : null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(autoCloseAfter ? Math.ceil(autoCloseAfter / 1000) : null);
 
   useEffect(() => {
     if (!autoCloseAfter) return;
@@ -30,7 +30,7 @@ const ApiErrorAlert = ({
       setVisible(false);
     }, autoCloseAfter);
 
-    // Setup countdown timer for minutes
+    // Setup countdown timer for seconds
     const countdownInterval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev === null || prev <= 1) {
@@ -39,7 +39,7 @@ const ApiErrorAlert = ({
         }
         return prev - 1;
       });
-    }, 60000); // Update every minute
+    }, 1000); // Update every second
 
     return () => {
       clearTimeout(closeTimer);
@@ -62,7 +62,7 @@ const ApiErrorAlert = ({
         )}
         {timeLeft !== null && (
           <span className="ml-2 text-xs">
-            (This message will close in {timeLeft} minute{timeLeft !== 1 ? 's' : ''})
+            (This message will close in {timeLeft} second{timeLeft !== 1 ? 's' : ''})
           </span>
         )}
         <div className="mt-2 flex items-center gap-2">

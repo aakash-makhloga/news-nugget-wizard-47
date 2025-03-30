@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -154,7 +155,7 @@ const Portfolio = () => {
             title="Using demo portfolio data"
             description="This portfolio uses sample data for demonstration purposes."
             onRetry={handleRefresh}
-            autoCloseAfter={300000} // 5 minutes
+            autoCloseAfter={5000} // 5 seconds
           />
         </div>
         
@@ -164,10 +165,10 @@ const Portfolio = () => {
               <div>
                 <h1 className="text-3xl font-display font-medium mb-2 flex items-center">
                   <Briefcase className="mr-3 h-6 w-6 text-blue-600" />
-                  मेरा पोर्टफोलियो
+                  My Portfolio
                 </h1>
                 <p className="text-gray-600">
-                  अपने निवेशों को ट्रैक करें और संबंधित समाचार देखें
+                  Track your investments and view related news
                 </p>
               </div>
               
@@ -176,14 +177,14 @@ const Portfolio = () => {
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
-                      स्टॉक जोड़ें
+                      Add Stock
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>पोर्टफोलियो में स्टॉक जोड़ें</DialogTitle>
+                      <DialogTitle>Add Stock to Portfolio</DialogTitle>
                       <DialogDescription>
-                        उस स्टॉक का विवरण दर्ज करें जिसे आप अपने पोर्टफोलियो में जोड़ना चाहते हैं।
+                        Enter the details of the stock you want to add to your portfolio.
                       </DialogDescription>
                     </DialogHeader>
                     
@@ -194,12 +195,12 @@ const Portfolio = () => {
                           name="symbol"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>स्टॉक सिंबल</FormLabel>
+                              <FormLabel>Stock Symbol</FormLabel>
                               <FormControl>
                                 <Input placeholder="AAPL" {...field} />
                               </FormControl>
                               <FormDescription>
-                                टिकर सिंबल दर्ज करें (उदाहरण, Apple के लिए AAPL)
+                                Enter the ticker symbol (e.g., AAPL for Apple)
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -211,7 +212,7 @@ const Portfolio = () => {
                           name="shares"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>शेयरों की संख्या</FormLabel>
+                              <FormLabel>Number of Shares</FormLabel>
                               <FormControl>
                                 <Input type="number" min="0.01" step="0.01" {...field} />
                               </FormControl>
@@ -225,7 +226,7 @@ const Portfolio = () => {
                           name="purchasePrice"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>खरीद मूल्य (प्रति शेयर)</FormLabel>
+                              <FormLabel>Purchase Price (per share)</FormLabel>
                               <FormControl>
                                 <Input type="number" min="0.01" step="0.01" {...field} />
                               </FormControl>
@@ -239,7 +240,7 @@ const Portfolio = () => {
                           name="purchaseDate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>खरीद तिथि</FormLabel>
+                              <FormLabel>Purchase Date</FormLabel>
                               <FormControl>
                                 <Input type="date" {...field} />
                               </FormControl>
@@ -249,7 +250,7 @@ const Portfolio = () => {
                         />
                         
                         <DialogFooter>
-                          <Button type="submit">पोर्टफोलियो में जोड़ें</Button>
+                          <Button type="submit">Add to Portfolio</Button>
                         </DialogFooter>
                       </form>
                     </Form>
@@ -260,12 +261,12 @@ const Portfolio = () => {
                   {refreshing ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      अपडेट हो रहा है...
+                      Updating...
                     </>
                   ) : (
                     <>
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      रिफ्रेश करें
+                      Refresh
                     </>
                   )}
                 </Button>
@@ -277,7 +278,7 @@ const Portfolio = () => {
             {loading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500 mr-3" />
-                <span className="text-lg text-gray-600">पोर्टफोलियो डेटा लोड हो रहा है...</span>
+                <span className="text-lg text-gray-600">Loading portfolio data...</span>
               </div>
             ) : (
               <>
@@ -347,11 +348,11 @@ const Portfolio = () => {
                   <TabsList className="mb-6">
                     <TabsTrigger value="stocks" className="flex items-center">
                       <Briefcase className="h-4 w-4 mr-2" />
-                      मेरे स्टॉक्स
+                      My Stocks
                     </TabsTrigger>
                     <TabsTrigger value="news" className="flex items-center">
                       <Newspaper className="h-4 w-4 mr-2" />
-                      संबंधित समाचार
+                      Related News
                       {relevantNews.length > 0 && (
                         <Badge className="ml-2 bg-blue-100 text-blue-800">{relevantNews.length}</Badge>
                       )}
