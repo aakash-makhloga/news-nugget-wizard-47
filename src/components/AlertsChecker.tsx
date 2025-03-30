@@ -5,6 +5,8 @@ import { checkAlertTriggers } from '@/utils/stockAlertsService';
 import { fetchPopularStocks } from '@/utils/stocksService';
 
 const AlertsChecker = () => {
+  const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  
   const checkForAlerts = async () => {
     try {
       // Fetch current stock data
@@ -25,9 +27,12 @@ const AlertsChecker = () => {
           title: `Price Alert: ${alert.symbol}`,
           description: `The price ${alert.isAboveTarget ? 'rose above' : 'fell below'} $${alert.targetPrice.toFixed(2)}`,
           variant: "success",
-          duration: 5000
+          duration: 10000 // Display for 10 seconds
         });
       });
+      
+      // Update last checked time
+      setLastChecked(new Date());
       
     } catch (error) {
       console.error('Error checking alerts:', error);
@@ -38,8 +43,8 @@ const AlertsChecker = () => {
     // Check alerts immediately when component mounts
     checkForAlerts();
     
-    // Set up interval to check alerts periodically (every 60 seconds)
-    const intervalId = setInterval(checkForAlerts, 60000);
+    // Set up interval to check alerts periodically (every 30 seconds)
+    const intervalId = setInterval(checkForAlerts, 30000);
     
     // Clean up interval on unmount
     return () => clearInterval(intervalId);

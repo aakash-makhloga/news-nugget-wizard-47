@@ -9,7 +9,7 @@ interface ApiErrorAlertProps {
   description?: string;
   showDocLink?: boolean;
   onRetry?: () => void;
-  autoCloseAfter?: number; // Time in milliseconds to auto-close
+  autoCloseAfter?: number; // Time in seconds to auto-close (not milliseconds)
 }
 
 const ApiErrorAlert = ({
@@ -17,18 +17,18 @@ const ApiErrorAlert = ({
   description = "This application is currently using demo data instead of real-time news.",
   showDocLink = false,
   onRetry,
-  autoCloseAfter = 5000 // Default to 5 seconds
+  autoCloseAfter = 5 // Default to 5 seconds
 }: ApiErrorAlertProps) => {
   const [visible, setVisible] = useState(true);
-  const [timeLeft, setTimeLeft] = useState<number | null>(autoCloseAfter ? Math.ceil(autoCloseAfter / 1000) : null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(autoCloseAfter || null);
 
   useEffect(() => {
     if (!autoCloseAfter) return;
 
-    // Setup auto-close timer
+    // Setup auto-close timer (convert seconds to milliseconds)
     const closeTimer = setTimeout(() => {
       setVisible(false);
-    }, autoCloseAfter);
+    }, autoCloseAfter * 1000);
 
     // Setup countdown timer for seconds
     const countdownInterval = setInterval(() => {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -42,7 +41,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-// Form schema for adding stocks
 const addStockSchema = z.object({
   symbol: z.string().min(1, "Symbol is required").max(10, "Symbol cannot exceed 10 characters"),
   shares: z.coerce.number().positive("Shares must be positive"),
@@ -72,14 +70,11 @@ const Portfolio = () => {
     try {
       setLoading(true);
       
-      // Get portfolio valuation
       const value = await getPortfolioValuation();
       setValuation(value);
       
-      // Get latest news
       const news = await fetchLatestNews();
       
-      // Filter for relevant news
       const relevant = getRelevantNewsForPortfolio(news, portfolio);
       setRelevantNews(relevant);
       
@@ -155,7 +150,7 @@ const Portfolio = () => {
             title="Using demo portfolio data"
             description="This portfolio uses sample data for demonstration purposes."
             onRetry={handleRefresh}
-            autoCloseAfter={5000} // 5 seconds
+            autoCloseAfter={5} // 5 seconds
           />
         </div>
         
@@ -282,7 +277,6 @@ const Portfolio = () => {
               </div>
             ) : (
               <>
-                {/* Portfolio Summary */}
                 {valuation && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -342,8 +336,7 @@ const Portfolio = () => {
                     </Card>
                   </motion.div>
                 )}
-
-                {/* Tabs for stocks and news */}
+                
                 <Tabs defaultValue="stocks" className="w-full">
                   <TabsList className="mb-6">
                     <TabsTrigger value="stocks" className="flex items-center">

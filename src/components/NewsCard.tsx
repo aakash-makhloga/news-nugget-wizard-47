@@ -1,7 +1,8 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Clock, Bookmark, Share2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Clock, Bookmark, Share2, TrendingUp, TrendingDown, ImageOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import SourceBadge from './SourceBadge';
@@ -25,6 +26,22 @@ interface NewsCardProps {
 }
 
 const NewsCard = ({ news, index }: NewsCardProps) => {
+  const [imageError, setImageError] = useState(false);
+  
+  // Array of fallback images to use when primary image fails
+  const fallbackImages = [
+    'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80'
+  ];
+  
+  // Get a random fallback image
+  const getRandomFallbackImage = () => {
+    const randomIndex = Math.floor(Math.random() * fallbackImages.length);
+    return fallbackImages[randomIndex];
+  };
+
   const timeAgo = (date: string) => {
     const now = new Date();
     const published = new Date(date);
@@ -58,6 +75,10 @@ const NewsCard = ({ news, index }: NewsCardProps) => {
     }
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -67,12 +88,25 @@ const NewsCard = ({ news, index }: NewsCardProps) => {
     >
       <Link to={`/news/${news.id}`} className="block h-full">
         <div className="relative overflow-hidden aspect-[16/9]">
-          <img 
-            src={news.imageUrl || 'https://via.placeholder.com/800x450?text=No+Image'} 
-            alt={news.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+          {imageError ? (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+              <img 
+                src={getRandomFallbackImage()}
+                alt={news.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                onError={handleImageError}
+              />
+            </div>
+          ) : (
+            <img 
+              src={news.imageUrl || getRandomFallbackImage()} 
+              alt={news.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+              onError={handleImageError}
+            />
+          )}
           <div className="absolute top-3 left-3 flex gap-2">
             <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-xs font-medium">
               {news.category}
