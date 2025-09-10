@@ -1,22 +1,22 @@
 import { NewsItem } from '@/components/NewsCard';
 
-// Using your provided NewsAPI key
-const NEWS_API_KEY = '2f56d667-d05a-4a0b-8df6-0dc4eea24705';
-const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
+// Using your provided Current API key
+const NEWS_API_KEY = '3SzDnSQ2utM0HZbBsCMN-ibhmrMGLi1hgqJU4t_lJlevBzRQ';
+const NEWS_API_BASE_URL = 'https://api.currentsapi.services/v1';
 
-// Function to transform the NewsAPI response to our NewsItem format
-const transformNewsApiResponse = (articles: any[]): NewsItem[] => {
+// Function to transform the Current API response to our NewsItem format
+const transformCurrentApiResponse = (articles: any[]): NewsItem[] => {
   return articles.map((article, index) => ({
     id: `${index}-${Date.now()}`, // Generate a unique ID
     title: article.title || 'No title available',
     summary: article.description || 'No description available',
-    source: article.source?.name || 'Unknown Source',
-    publishedAt: article.publishedAt || new Date().toISOString(),
-    imageUrl: article.urlToImage || 'https://via.placeholder.com/800x450?text=No+Image',
+    source: article.author || 'Unknown Source',
+    publishedAt: article.published || new Date().toISOString(),
+    imageUrl: article.image || 'https://via.placeholder.com/800x450?text=No+Image',
     category: article.category || determineCategory(article.title, article.description),
     sentiment: determineSentiment(article.title, article.description),
     url: article.url || '#',
-    country: article.country || determineCountry(article.source?.name)
+    country: article.language === 'en' ? 'USA' : 'Global'
   }));
 };
 
@@ -86,7 +86,7 @@ const determineCountry = (sourceName: string = ''): string => {
 export const fetchLatestNews = async (): Promise<NewsItem[]> => {
   try {
     const response = await fetch(
-      `${NEWS_API_BASE_URL}/top-headlines?country=us&apiKey=${NEWS_API_KEY}`
+      `${NEWS_API_BASE_URL}/latest-news?apiKey=${NEWS_API_KEY}`
     );
     
     if (!response.ok) {
@@ -94,7 +94,7 @@ export const fetchLatestNews = async (): Promise<NewsItem[]> => {
     }
     
     const data = await response.json();
-    return transformNewsApiResponse(data.articles || []);
+    return transformCurrentApiResponse(data.news || []);
   } catch (error) {
     console.error('Error fetching latest news:', error);
     // Fallback to mock data if API fails
@@ -104,7 +104,7 @@ export const fetchLatestNews = async (): Promise<NewsItem[]> => {
 
 export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]> => {
   try {
-    // Map categories to NewsAPI categories
+    // Map categories to Current API categories
     const categoryMap: Record<string, string> = {
       'business': 'business',
       'technology': 'technology',
@@ -116,7 +116,7 @@ export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]>
     const apiCategory = categoryMap[category.toLowerCase()] || 'business';
     
     const response = await fetch(
-      `${NEWS_API_BASE_URL}/top-headlines?country=us&category=${apiCategory}&apiKey=${NEWS_API_KEY}`
+      `${NEWS_API_BASE_URL}/latest-news?category=${apiCategory}&apiKey=${NEWS_API_KEY}`
     );
     
     if (!response.ok) {
@@ -124,7 +124,7 @@ export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]>
     }
     
     const data = await response.json();
-    return transformNewsApiResponse(data.articles || []);
+    return transformCurrentApiResponse(data.news || []);
   } catch (error) {
     console.error('Error fetching news by category:', error);
     // Fallback to mock data if API fails
@@ -135,22 +135,22 @@ export const fetchNewsByCategory = async (category: string): Promise<NewsItem[]>
 
 export const fetchNewsByCountry = async (country: string): Promise<NewsItem[]> => {
   try {
-    // Map countries to NewsAPI country codes
+    // Map countries to Current API regions
     const countryMap: Record<string, string> = {
-      'usa': 'us',
-      'united kingdom': 'gb',
-      'japan': 'jp',
-      'india': 'in',
-      'china': 'cn',
-      'brazil': 'br',
-      'european union': 'fr', // Use France as EU representative
-      'global': 'us' // Default to US for global news
+      'usa': 'US',
+      'united kingdom': 'GB',
+      'japan': 'JP',
+      'india': 'IN',
+      'china': 'CN',
+      'brazil': 'BR',
+      'european union': 'EU',
+      'global': 'US' // Default to US for global news
     };
     
-    const countryCode = countryMap[country.toLowerCase()] || 'us';
+    const regionCode = countryMap[country.toLowerCase()] || 'US';
     
     const response = await fetch(
-      `${NEWS_API_BASE_URL}/top-headlines?country=${countryCode}&apiKey=${NEWS_API_KEY}`
+      `${NEWS_API_BASE_URL}/latest-news?region=${regionCode}&apiKey=${NEWS_API_KEY}`
     );
     
     if (!response.ok) {
@@ -158,7 +158,7 @@ export const fetchNewsByCountry = async (country: string): Promise<NewsItem[]> =
     }
     
     const data = await response.json();
-    return transformNewsApiResponse(data.articles || []);
+    return transformCurrentApiResponse(data.news || []);
   } catch (error) {
     console.error('Error fetching news by country:', error);
     // Fallback to mock data if API fails
