@@ -24,6 +24,7 @@ import { generateNewsAnalysis } from '@/utils/aiService';
 import { toast } from '@/components/ui/use-toast';
 import ApiErrorAlert from '@/components/ApiErrorAlert';
 import SourceBadge from '@/components/SourceBadge';
+import SEOHead from '@/components/SEOHead';
 
 const Index = () => {
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
@@ -48,7 +49,7 @@ const Index = () => {
       
       setLatestNews(news);
       
-      setUsingMockData(true);
+      setUsingMockData(false);
       
       if (news.length > 0) {
         const analysis = await generateNewsAnalysis(news[0].id);
@@ -59,8 +60,8 @@ const Index = () => {
       }
       
       toast({
-        title: "News data loaded",
-        description: "The news feed has been updated with sample stories.",
+        title: "News updated",
+        description: `Loaded ${news.length} latest stories`,
         duration: 3000,
       });
     } catch (error) {
@@ -103,18 +104,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead />
       <Header />
       
       <main className="flex-grow pt-16">
-        {/* Demo Data Alert */}
-        <div className="container px-4 md:px-6 mx-auto mt-8">
-          <ApiErrorAlert 
-            title="Using demo news data"
-            description="This application is showing sample financial news for demonstration purposes."
-            onRetry={handleRefresh}
-            autoCloseAfter={300000} // 5 minutes in milliseconds
-          />
-        </div>
+        {/* API Error Alert - only show if there's an actual error */}
+        {apiError && (
+          <div className="container px-4 md:px-6 mx-auto mt-8">
+            <ApiErrorAlert 
+              title="Connection Issue"
+              description={apiError}
+              onRetry={handleRefresh}
+              autoCloseAfter={10000}
+            />
+          </div>
+        )}
         
         {/* Hero section */}
         <section className="relative overflow-hidden">
@@ -289,11 +293,11 @@ const Index = () => {
         </section>
         
         {/* Latest news */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-muted/30">
           <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
               <div>
-                <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 mb-4">
+                <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-primary/10 text-primary border border-primary/20 mb-4">
                   <Newspaper className="h-4 w-4 mr-2" />
                   Latest Updates
                 </div>
