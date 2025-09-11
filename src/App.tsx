@@ -11,6 +11,10 @@ import Stocks from '@/pages/Stocks'
 import NotFound from '@/pages/NotFound'
 import Notifications from '@/pages/Notifications'
 import Portfolio from '@/pages/Portfolio'
+import Profile from '@/pages/Profile'
+import Settings from '@/pages/Settings'
+import About from '@/pages/About'
+import Contact from '@/pages/Contact'
 import ThemeProvider from '@/components/ThemeProvider'
 import AlertsChecker from '@/components/AlertsChecker'
 
@@ -29,6 +33,10 @@ const App = () => {
           <Route path="/stocks/:symbol" element={<Stocks />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
