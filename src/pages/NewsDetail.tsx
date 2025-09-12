@@ -42,7 +42,7 @@ const NewsDetail = () => {
           setRelatedNews(
             allNews
               .filter(item => item.id !== id)
-              .filter(item => item.category === newsData.category)
+              .filter(item => item.category && newsData.category && item.category === newsData.category)
               .slice(0, 3)
           );
         }
@@ -111,8 +111,8 @@ const NewsDetail = () => {
           <div className="flex items-center text-sm text-gray-600 mb-8">
             <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
             <ChevronRight className="h-3 w-3 mx-2" />
-            <Link to={`/category/${news.category.toLowerCase()}`} className="hover:text-blue-600 transition-colors">
-              {news.category}
+            <Link to={`/category/${news.category?.toLowerCase() || 'general'}`} className="hover:text-blue-600 transition-colors">
+              {news.category || 'General'}
             </Link>
             <ChevronRight className="h-3 w-3 mx-2" />
             <span className="text-gray-500 truncate">{news.title}</span>
@@ -128,7 +128,7 @@ const NewsDetail = () => {
         >
           <div className="max-w-4xl mx-auto">
             <Badge variant="outline" className="mb-4">
-              {news.category}
+              {news.category || 'General'}
             </Badge>
             
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-semibold leading-tight mb-6 text-balance">
@@ -313,7 +313,7 @@ const NewsDetail = () => {
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-medium">Related News</h2>
                 <Button variant="outline" asChild>
-                  <Link to={`/category/${news.category.toLowerCase()}`}>
+                  <Link to={`/category/${news.category?.toLowerCase() || 'general'}`}>
                     View All
                     <ChevronRight className="ml-1 h-4 w-4" />
                   </Link>
