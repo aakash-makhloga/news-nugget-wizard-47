@@ -1,15 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import NotificationCenter from './NotificationCenter';
 
 const Header = () => {
@@ -76,29 +70,6 @@ const Header = () => {
           
           <div className="hidden md:flex items-center space-x-2">
             <NotificationCenter />
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="font-medium">
-                  Account <ChevronDown className="ml-1 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link to="/notifications">Notifications</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings">Settings</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <Button size="sm" asChild>
-              <Link to="/get-started">Get Started</Link>
-            </Button>
           </div>
           
           <div className="md:hidden flex items-center space-x-2">
@@ -139,12 +110,6 @@ const Header = () => {
                 className="px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-50"
               >
                 Notifications
-              </Link>
-              <Link 
-                to="/get-started"
-                className="mt-2 w-full px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 rounded-md hover:bg-blue-700"
-              >
-                Get Started
               </Link>
             </nav>
           </div>

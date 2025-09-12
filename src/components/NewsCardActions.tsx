@@ -8,7 +8,13 @@ interface NewsCardActionsProps {
   onShare: (e: React.MouseEvent) => void;
 }
 
-const NewsCardActions = ({ isBookmarked, onBookmark, onShare }: NewsCardActionsProps) => {
+  const NewsCardActions = ({ isBookmarked, onBookmark, onShare }: NewsCardActionsProps) => {
+  const handleClick = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault();
+    e.stopPropagation();
+    action();
+  };
+
   return (
     <div className="flex items-center justify-between pt-2 border-t border-border/50">
       <div className="flex items-center gap-1">
@@ -16,7 +22,7 @@ const NewsCardActions = ({ isBookmarked, onBookmark, onShare }: NewsCardActionsP
           variant="ghost" 
           size="sm" 
           className={`h-8 px-2 hover:bg-primary/10 ${isBookmarked ? 'text-primary' : ''}`}
-          onClick={onBookmark}
+          onClick={(e) => handleClick(e, () => onBookmark(e))}
         >
           <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
         </Button>
@@ -24,20 +30,11 @@ const NewsCardActions = ({ isBookmarked, onBookmark, onShare }: NewsCardActionsP
           variant="ghost" 
           size="sm" 
           className="h-8 px-2 hover:bg-primary/10"
-          onClick={onShare}
+          onClick={(e) => handleClick(e, () => onShare(e))}
         >
           <Share2 className="h-4 w-4" />
         </Button>
       </div>
-      
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="h-8 px-2 text-xs text-muted-foreground hover:text-primary"
-      >
-        Read more
-        <ExternalLink className="h-3 w-3 ml-1" />
-      </Button>
     </div>
   );
 };
