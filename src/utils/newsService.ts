@@ -16,7 +16,7 @@ const transformCurrentApiResponse = (articles: any[]): NewsItem[] => {
     source: article.author || 'Unknown Source',
     publishedAt: article.published || new Date().toISOString(),
     imageUrl: article.image || 'https://via.placeholder.com/800x450?text=No+Image',
-    category: article.category || determineCategory(article.title, article.description),
+    category: normalizeCategory(article.category, article.title, article.description),
     sentiment: determineSentiment(article.title, article.description),
     url: article.url || '#',
     country: article.language === 'en' ? 'USA' : 'Global'
@@ -42,6 +42,16 @@ const determineCategory = (title: string = '', description: string = ''): string
   } else {
     return 'General';
   }
+};
+
+// Normalize category from API to a single string
+const normalizeCategory = (input: any, title?: string, description?: string): string => {
+  if (typeof input === 'string' && input.trim()) return input;
+  if (Array.isArray(input) && input.length > 0) {
+    const first = input.find((c: any) => typeof c === 'string' && c.trim()) ?? input[0];
+    if (typeof first === 'string') return first;
+  }
+  return determineCategory(title, description);
 };
 
 // Helper function to determine sentiment based on title and description
