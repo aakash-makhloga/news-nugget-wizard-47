@@ -17,6 +17,8 @@ import StockTicker from '@/components/StockTicker';
 import NewsGrid from '@/components/NewsGrid';
 import AIAnalysis from '@/components/AIAnalysis';
 import Footer from '@/components/Footer';
+import SearchBar from '@/components/SearchBar';
+import TrendingTopics from '@/components/TrendingTopics';
 import { fetchLatestNews, fetchNewsByCountry } from '@/utils/newsService';
 import { NewsItem } from '@/components/NewsCard';
 import { fetchPopularStocks } from '@/utils/stocksService';
@@ -34,6 +36,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [usingMockData, setUsingMockData] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = useCallback(async () => {
     try {
@@ -91,6 +94,18 @@ const Index = () => {
     loadData();
   };
 
+  const getFilteredNews = (newsArray: NewsItem[]) => {
+    if (!searchQuery.trim()) return newsArray;
+    
+    const query = searchQuery.toLowerCase().trim();
+    return newsArray.filter(item => 
+      item.title.toLowerCase().includes(query) ||
+      item.summary.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query) ||
+      item.source.toLowerCase().includes(query)
+    );
+  };
+
   const countries = [
     { id: 'global', name: 'Global News' },
     { id: 'USA', name: 'United States' },
@@ -140,13 +155,11 @@ const Index = () => {
                 <p className="text-responsive-lg text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
                   Complex business news explained simply with AI-powered insights. Stay informed about what really matters for your financial decisions.
                 </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-                  <Button size="lg" className="btn-glow font-medium px-8 h-12" asChild>
-                    <Link to="/get-started">
-                      Get Started Free
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
+                <div className="flex flex-col items-center justify-center gap-6 mb-12">
+                  <SearchBar 
+                    onSearch={setSearchQuery}
+                    placeholder="Search financial news, stocks, topics..."
+                  />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button size="lg" variant="outline" className="font-medium px-8 h-12 glass">
@@ -295,76 +308,84 @@ const Index = () => {
         {/* Latest news */}
         <section className="py-16 bg-muted/30">
           <div className="container px-4 md:px-6 mx-auto">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
-              <div>
-                <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-primary/10 text-primary border border-primary/20 mb-4">
-                  <Newspaper className="h-4 w-4 mr-2" />
-                  Latest Updates
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className="lg:col-span-3">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                  <div>
+                    <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-primary/10 text-primary border border-primary/20 mb-4">
+                      <Newspaper className="h-4 w-4 mr-2" />
+                      Latest Updates
+                    </div>
+                    <h2 className="text-3xl font-display font-medium">
+                      {searchQuery ? `Search Results for "${searchQuery}"` : selectedCountry ? `Top Stories from ${selectedCountry}` : "Today's Top Stories"}
+                    </h2>
+                  </div>
+                  <Button variant="link" className="font-medium mt-4 md:mt-0">
+                    View All News
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
                 </div>
-                <h2 className="text-3xl font-display font-medium">
-                  {selectedCountry ? `Top Stories from ${selectedCountry}` : "Today's Top Stories"}
-                </h2>
+                
+                <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="mb-8">
+                    <TabsTrigger value="all" className="text-sm">All</TabsTrigger>
+                    <TabsTrigger value="business" className="text-sm">Business</TabsTrigger>
+                    <TabsTrigger value="markets" className="text-sm">Markets</TabsTrigger>
+                    <TabsTrigger value="technology" className="text-sm">Technology</TabsTrigger>
+                    <TabsTrigger value="crypto" className="text-sm">Crypto</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="all">
+                    <NewsGrid 
+                      news={getFilteredNews(latestNews)} 
+                      loading={loading} 
+                      onRefresh={handleRefresh}
+                      onFilterByCountry={handleCountryFilter}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="business">
+                    <NewsGrid 
+                      news={getFilteredNews(latestNews.filter(n => n.category === 'Business'))} 
+                      loading={loading} 
+                      onRefresh={handleRefresh}
+                      onFilterByCountry={handleCountryFilter}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="markets">
+                    <NewsGrid 
+                      news={getFilteredNews(latestNews.filter(n => n.category === 'Economy' || n.category === 'Commodities'))} 
+                      loading={loading}
+                      onRefresh={handleRefresh}
+                      onFilterByCountry={handleCountryFilter}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="technology">
+                    <NewsGrid 
+                      news={getFilteredNews(latestNews.filter(n => n.category === 'Technology'))} 
+                      loading={loading}
+                      onRefresh={handleRefresh}
+                      onFilterByCountry={handleCountryFilter}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="crypto">
+                    <NewsGrid 
+                      news={getFilteredNews(latestNews.filter(n => n.category === 'Cryptocurrency'))} 
+                      loading={loading}
+                      onRefresh={handleRefresh}
+                      onFilterByCountry={handleCountryFilter}
+                    />
+                  </TabsContent>
+                </Tabs>
               </div>
-              <Button variant="link" className="font-medium mt-4 md:mt-0">
-                View All News
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
+              
+              <div className="space-y-6">
+                <TrendingTopics />
+              </div>
             </div>
-            
-            <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-8">
-                <TabsTrigger value="all" className="text-sm">All</TabsTrigger>
-                <TabsTrigger value="business" className="text-sm">Business</TabsTrigger>
-                <TabsTrigger value="markets" className="text-sm">Markets</TabsTrigger>
-                <TabsTrigger value="technology" className="text-sm">Technology</TabsTrigger>
-                <TabsTrigger value="crypto" className="text-sm">Crypto</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="all">
-                <NewsGrid 
-                  news={latestNews} 
-                  loading={loading} 
-                  onRefresh={handleRefresh}
-                  onFilterByCountry={handleCountryFilter}
-                />
-              </TabsContent>
-              
-              <TabsContent value="business">
-                <NewsGrid 
-                  news={latestNews.filter(n => n.category === 'Business')} 
-                  loading={loading} 
-                  onRefresh={handleRefresh}
-                  onFilterByCountry={handleCountryFilter}
-                />
-              </TabsContent>
-              
-              <TabsContent value="markets">
-                <NewsGrid 
-                  news={latestNews.filter(n => n.category === 'Economy' || n.category === 'Commodities')} 
-                  loading={loading}
-                  onRefresh={handleRefresh}
-                  onFilterByCountry={handleCountryFilter}
-                />
-              </TabsContent>
-              
-              <TabsContent value="technology">
-                <NewsGrid 
-                  news={latestNews.filter(n => n.category === 'Technology')} 
-                  loading={loading}
-                  onRefresh={handleRefresh}
-                  onFilterByCountry={handleCountryFilter}
-                />
-              </TabsContent>
-              
-              <TabsContent value="crypto">
-                <NewsGrid 
-                  news={latestNews.filter(n => n.category === 'Cryptocurrency')} 
-                  loading={loading}
-                  onRefresh={handleRefresh}
-                  onFilterByCountry={handleCountryFilter}
-                />
-              </TabsContent>
-            </Tabs>
           </div>
         </section>
         

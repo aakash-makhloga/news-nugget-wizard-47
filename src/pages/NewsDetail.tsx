@@ -10,6 +10,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AIAnalysis from '@/components/AIAnalysis';
 import NewsGrid from '@/components/NewsGrid';
+import ReadingProgress from '@/components/ReadingProgress';
 import { fetchNewsById, fetchLatestNews } from '@/utils/newsService';
 import { generateNewsAnalysis } from '@/utils/aiService';
 import { NewsItem } from '@/components/NewsCard';
@@ -101,6 +102,7 @@ const NewsDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ReadingProgress />
       <Header />
       
       <main className="flex-grow pt-16">

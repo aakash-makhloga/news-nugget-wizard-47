@@ -4,6 +4,9 @@ import { NewsItem } from '@/components/NewsCard';
 const NEWS_API_KEY = '3SzDnSQ2utM0HZbBsCMN-ibhmrMGLi1hgqJU4t_lJlevBzRQ';
 const NEWS_API_BASE_URL = 'https://api.currentsapi.services/v1';
 
+// In-memory cache for fetched news
+let newsCache: NewsItem[] = [];
+
 // Function to transform the Current API response to our NewsItem format
 const transformCurrentApiResponse = (articles: any[]): NewsItem[] => {
   return articles.map((article, index) => ({
@@ -94,11 +97,15 @@ export const fetchLatestNews = async (): Promise<NewsItem[]> => {
     }
     
     const data = await response.json();
-    return transformCurrentApiResponse(data.news || []);
+    const news = transformCurrentApiResponse(data.news || []);
+    newsCache = news; // Store in cache
+    return news;
   } catch (error) {
     console.error('Error fetching latest news:', error);
     // Fallback to mock data if API fails
-    return fetchMockNews();
+    const mockNews = await fetchMockNews();
+    newsCache = mockNews; // Store in cache
+    return mockNews;
   }
 };
 
@@ -171,8 +178,20 @@ export const fetchNewsByCountry = async (country: string): Promise<NewsItem[]> =
 
 export const fetchNewsById = async (id: string): Promise<NewsItem | null> => {
   try {
-    const allNews = await fetchMockNews();
-    return allNews.find(news => news.id === id) || null;
+    // First check in cache, if empty fetch latest news
+    if (newsCache.length === 0) {
+      await fetchLatestNews();
+    }
+    
+    // Look for the article in cache first
+    const cachedArticle = newsCache.find(news => news.id === id);
+    if (cachedArticle) {
+      return cachedArticle;
+    }
+    
+    // Fallback to mock data
+    const mockNews = await fetchMockNews();
+    return mockNews.find(news => news.id === id) || null;
   } catch (error) {
     console.error('Error fetching news by ID:', error);
     return null;
