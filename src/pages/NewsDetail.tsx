@@ -180,43 +180,54 @@ const NewsDetail = () => {
               >
                 <p className="text-xl font-medium leading-relaxed text-gray-800 mb-6">{news.summary}</p>
                 
-                <p className="mb-4">
-                  The recent announcement by {news.source} has captured the attention of financial experts and everyday investors alike. Market analysts suggest that this development could have significant implications for the industry as a whole.
-                </p>
-                
-                <p className="mb-4">
-                  According to industry experts, this news represents a potential shift in how businesses approach their operations and strategic planning. The immediate impact was evident in market reactions, with related stocks showing notable movement following the announcement.
-                </p>
-                
-                <h2 className="text-2xl font-medium mt-8 mb-4">What This Means for Investors</h2>
-                
-                <p className="mb-4">
-                  For individual investors, this development presents both opportunities and challenges. Those with existing positions in affected sectors may want to reassess their portfolio strategy in light of this news.
-                </p>
-                
-                <p className="mb-4">
-                  Market strategists recommend maintaining a balanced approach while monitoring how this situation evolves over the coming weeks and months. Long-term implications remain to be seen, but short-term volatility is expected.
-                </p>
-                
-                <h2 className="text-2xl font-medium mt-8 mb-4">Industry Response</h2>
-                
-                <p className="mb-4">
-                  Competitors in the same space have already begun positioning themselves in response to this announcement. Some are taking defensive measures, while others see this as an opportunity to gain market share through strategic initiatives.
-                </p>
-                
-                <p className="mb-4">
-                  Regulatory bodies are also closely monitoring the situation, with potential oversight changes possible depending on how market dynamics shift in response to this development.
-                </p>
-                
-                <h2 className="text-2xl font-medium mt-8 mb-4">Looking Ahead</h2>
-                
-                <p className="mb-4">
-                  The next quarterly earnings reports will be particularly significant for companies in this sector, as they will provide concrete data on how this news has affected financial performance and future projections.
-                </p>
-                
-                <p className="mb-6">
-                  Investors and market watchers should stay informed as this situation continues to develop, with particular attention to official statements from key industry players and regulatory authorities.
-                </p>
+                <div className="space-y-4">
+                  {/* Show actual content if available, otherwise enhanced summary */}
+                  {news.content && news.content !== news.summary ? (
+                    <div dangerouslySetInnerHTML={{ __html: news.content.replace(/\n/g, '<br/>') }} />
+                  ) : (
+                    <>
+                      <p className="mb-4">
+                        This development from {news.source} represents significant news in the {news.category?.toLowerCase() || 'general'} sector. 
+                        The implications of this announcement are being closely watched by industry analysts and market participants.
+                      </p>
+                      
+                      <p className="mb-4">
+                        Based on the initial reports, this news could influence market sentiment and related sectors. 
+                        {news.sentiment === 'positive' && 'Early indicators suggest a positive reception from the market.'}
+                        {news.sentiment === 'negative' && 'There are concerns about potential negative impacts on the sector.'}
+                        {news.sentiment === 'neutral' && 'Market reaction appears to be measured as participants assess the implications.'}
+                      </p>
+                      
+                      {news.url && news.url !== '#' && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-6">
+                          <p className="text-sm text-blue-800 mb-3">
+                            <strong>Read the full article from the original source:</strong>
+                          </p>
+                          <Button asChild variant="outline" size="sm">
+                            <a href={news.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
+                              View Original Article
+                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          </Button>
+                        </div>
+                      )}
+                      
+                      <h2 className="text-2xl font-medium mt-8 mb-4">Market Context</h2>
+                      
+                      <p className="mb-4">
+                        Understanding this news requires considering the broader context of the {news.category?.toLowerCase() || 'financial'} landscape. 
+                        Recent trends in this sector have shown {news.sentiment === 'positive' ? 'encouraging' : news.sentiment === 'negative' ? 'challenging' : 'mixed'} signals.
+                      </p>
+                      
+                      <p className="mb-6">
+                        For readers looking to understand the full implications, we recommend following up with additional analysis from 
+                        {news.source} and other authoritative sources in this field.
+                      </p>
+                    </>
+                  )}
+                </div>
                 
                 <Separator className="my-8" />
                 

@@ -10,9 +10,10 @@ let newsCache: NewsItem[] = [];
 // Function to transform the Current API response to our NewsItem format
 const transformCurrentApiResponse = (articles: any[]): NewsItem[] => {
   return articles.map((article, index) => ({
-    id: `${index}-${Date.now()}`, // Generate a unique ID
+    id: article.id || `${index}-${Date.now()}`, // Use API ID if available
     title: article.title || 'No title available',
     summary: article.description || 'No description available',
+    content: article.description || 'No content available', // Will be enhanced later
     source: article.author || 'Unknown Source',
     publishedAt: article.published || new Date().toISOString(),
     imageUrl: article.image || 'https://via.placeholder.com/800x450?text=No+Image',

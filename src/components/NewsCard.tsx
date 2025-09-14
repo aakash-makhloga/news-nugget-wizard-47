@@ -11,6 +11,7 @@ export interface NewsItem {
   id: string;
   title: string;
   summary: string;
+  content?: string;
   source: string;
   publishedAt: string;
   imageUrl: string;
